@@ -1,0 +1,24 @@
+# Compiled binary
+resume-generator
+resume-generator.exe
+
+# Generated output files
+*.html
+*.pdf
+
+# But keep example files for demo
+!example/*.html
+!example/*.pdf
+
+# Go dependencies (go.sum will be regenerated)
+# Commented out - keep go.sum for reproducible builds
+# go.sum
+
+# OS files
+.DS_Store
+.DS_Store?
+
+# Test files
+test/
+*.tmp
+*.bak

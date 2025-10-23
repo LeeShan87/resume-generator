@@ -1,0 +1,58 @@
+# Example Makefile for Hugo integration
+# Copy this to your Hugo project root and customize as needed
+
+# Configuration
+CV_NAME = Your_Name_CV
+
+.PHONY: cv cv-local clean-cv clean-cv-local help
+
+# Default target
+help:
+	@echo "CV Generation targets:"
+	@echo "  make cv          - Generate public CVs from content/cv/*.md to static/cv/"
+	@echo "  make cv-local    - Generate private CVs from local_cvs/*.md to local_cvs/generated/"
+	@echo "  make clean-cv    - Clean public generated CVs"
+	@echo "  make clean-cv-local - Clean local generated CVs"
+
+# Generate public CVs from content/cv/*.md
+cv:
+	@echo "Generating public CVs from content/cv/..."
+	@for md in content/cv/*.md; do \
+		if [ -f "$$md" ] && [ "$$(basename $$md)" != "_index.md" ]; then \
+			name=$$(basename $$md .md); \
+			echo "  - $$name"; \
+			mkdir -p static/cv/$$name; \
+			cd resume-generator && go run resume.go \
+				-o ../static/cv/$$name/$(CV_NAME) \
+				../$$md && cd ..; \
+		fi \
+	done
+	@echo "✓ Public CVs generated in static/cv/"
+
+# Generate local/private CVs from local_cvs/*.md
+cv-local:
+	@echo "Generating local CVs from local_cvs/..."
+	@for md in local_cvs/*.md; do \
+		if [ -f "$$md" ]; then \
+			name=$$(basename $$md .md); \
+			echo "  - $$name"; \
+			mkdir -p local_cvs/generated/$$name; \
+			cd resume-generator && go run resume.go \
+				-o ../local_cvs/generated/$$name/$(CV_NAME) \
+				../$$md && cd ..; \
+		fi \
+	done
+	@echo "✓ Local CVs generated in local_cvs/generated/"
+
+# Clean public CVs
+clean-cv:
+	@echo "Cleaning public CVs..."
+	@rm -rf static/cv/*/$(CV_NAME).pdf
+	@rm -rf static/cv/*/$(CV_NAME).html
+	@echo "✓ Public CVs cleaned"
+
+# Clean local CVs
+clean-cv-local:
+	@echo "Cleaning local CVs..."
+	@rm -rf local_cvs/generated
+	@echo "✓ Local CVs cleaned"
